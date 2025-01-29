@@ -1,13 +1,18 @@
 require "http"
 require "json"
 
-require "./usage"
+require "./meta"
 require "./message"
+
 require "./chat/chat_request"
 require "./chat/chat_response"
 require "./chat/tool"
+
 require "./embed/embed_request"
 require "./embed/embed_response"
+
+require "./classify/classify_request"
+require "./classify/classify_response"
 
 module Cohere
   # Base error class for all Cohere errors
@@ -69,6 +74,18 @@ module Cohere
         end
 
         Embed::EmbedResponse.new JSON::PullParser.new(response.body)
+      end
+    end
+
+    def classify(request : Classify::ClassifyRequest) : Classify::ClassifyResponse
+      response = request("POST", "/v1/classify", request.to_json)
+
+      handle_response(response) do
+        if response.content_type != "application/json"
+          raise ContentTypeError.new("Classify response has unexpected content type: #{response.content_type}")
+        end
+
+        Classify::ClassifyResponse.new JSON::PullParser.new(response.body)
       end
     end
 

@@ -48,7 +48,7 @@ module Cohere::Embed
         property input_type : InputType
 
         # The type of embeddings you want to get back.
-        property embedding_types : EmbeddingTypes
+        property embedding_types : Array(EmbeddingTypes)
 
         # The texts to embed
         property texts : Array(String)
@@ -60,10 +60,15 @@ module Cohere::Embed
         def initialize(
             @model : String = "embed-english-v2.0",
             @input_type : InputType = InputType::SearchDocument,
-            @embedding_types : EmbeddingTypes = EmbeddingTypes::Float,
+            embedding_types : Array(EmbeddingTypes) | EmbeddingTypes = [EmbeddingTypes::Float],
             @texts = [] of String,
             @truncate : TruncationMode = TruncationMode::None
         )
+            if embedding_types.is_a?(Array)
+                @embedding_types = embedding_types.as(Array(EmbeddingTypes))
+            else
+                @embedding_types = [embedding_types]
+            end
         end
     end
 end

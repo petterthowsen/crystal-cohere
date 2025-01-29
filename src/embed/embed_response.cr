@@ -14,6 +14,8 @@ module Cohere::Embed
     alias UInt8Vector = Array(UInt8)
     alias BinaryVector = Array(Int8)
     alias UBinaryVector = Array(UInt8)
+
+    alias Embedding = FloatVector | Int8Vector | UInt8Vector | BinaryVector | UBinaryVector
     
     struct Image
         include JSON::Serializable
@@ -32,8 +34,6 @@ module Cohere::Embed
         getter binary : Array(BinaryVector)?
         getter ubinary : Array(UBinaryVector)?
 
-        getter type : EmbeddingsType
-
         def initialize(
             @float : Array(FloatVector)? = nil,
             @int8 : Array(Int8Vector)? = nil,
@@ -41,8 +41,10 @@ module Cohere::Embed
             @binary : Array(BinaryVector)? = nil,
             @ubinary : Array(UBinaryVector)? = nil
         )
-            # determine type
-            @type = case
+        end
+        
+        def type() : EmbeddingsType
+            case
             when @float
                 EmbeddingsType::Float
             when @int8
@@ -57,47 +59,10 @@ module Cohere::Embed
                 EmbeddingsType::Float
             end
         end
-        
-        def vectors() : Array(FloatVector | Int8Vector | UInt8Vector | BinaryVector | UBinaryVector)
-            case @type
-            when EmbeddingsType::Float
-                @float.not_nil!
-            when EmbeddingsType::Int8
-                @int8.not_nil!
-            when EmbeddingsType::Uint8
-                @uint8.not_nil!
-            when EmbeddingsType::Binary
-                @binary.not_nil!
-            when EmbeddingsType::Ubinary
-                @ubinary.not_nil!
-            else
-                @float.not_nil!
-            end
-        end
     end
 
     struct EmbedResponse
         include JSON::Serializable
-
-        struct Meta
-            include JSON::Serializable
-
-            struct APIVersion
-                include JSON::Serializable
-
-                getter version : String
-                getter is_deprecated : Bool?
-                getter is_experimental : Bool?
-            end
-
-            getter api_version : APIVersion?
-
-            getter billed_units : BilledUnits?
-
-            getter tokens : Tokens?
-
-            getter warnings : Array(String)?
-        end
 
         getter id : String
         getter texts : Array(String)
