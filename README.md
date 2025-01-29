@@ -1,6 +1,8 @@
 # cohere
 
-TODO: Write a description here
+Client for Cohere's API.
+
+Currently supports the embed and classify endpoints.
 
 ## Installation
 
